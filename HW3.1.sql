@@ -32,3 +32,36 @@ UPDATE employee SET  first_name = 'Dmitriy' WHERE id = 6;
 SELECT first_name, SUM(age) FROM employee GROUP BY first_name;
 SELECT first_name, MIN(age) FROM employee GROUP BY first_name;
 SELECT first_name, MAX(age) FROM employee GROUP BY first_name HAVING COUNT(age) > 1;
+CREATE TABLE city (
+city_id BIGSERIAL NOT NULL PRIMARY KEY,
+city_name VARCHAR(50) NOT NULL
+);
+ALTER TABLE employee ADD COLUMN city_id INT REFERENCES city (city_id);
+INSERT INTO city(
+city_name)
+VALUES ('Moscow'),
+('Berlin'),
+('Tbilisi');
+UPDATE employee SET city_id =
+CASE
+WHEN id = 1 or id = 2 THEN 1
+WHEN id = 4 or id = 5 THEN 2
+WHEN id = 6 THEN 3
+END
+WHERE id IN (1,2,4,5,6);
+SELECT e.first_name, e.last_name, c.city_name
+FROM employee e
+INNER JOIN city c ON c.city_id = e.city_id;
+SELECT c.city_name, e.first_name, e.last_name
+FROM city c
+LEFT JOIN employee e ON c.city_id = e.city_id;
+SELECT e.first_name, e.last_name, c.city_name
+FROM employee e
+FULL JOIN city c ON c.city_id = e.city_id;
+SELECT e.first_name, e.last_name, c.city_name
+FROM employee e
+CROSS JOIN city c;
+SELECT c.city_name
+FROM city c
+LEFT JOIN employee e ON c.city_id = e.city_id
+WHERE e.city_id IS NULL;
